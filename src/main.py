@@ -3,6 +3,7 @@ SERVER_PORT = 6666
 separator = "<SEP>"
 
 def main():
+    serverconn = ServerConnection("localhost")
     print("Welcome in BPost-Client")
 
 if __name__ == '__main__' :
