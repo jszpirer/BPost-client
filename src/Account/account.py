@@ -1,11 +1,9 @@
 class Account:
 
-    contacts = []
-
-    def __init__(self, username, password, contacts):
+    def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.contacts = contacts
+        self.contacts = []
 
     # store username and password in database
 
