@@ -1,8 +1,11 @@
 class Account:
 
-    def __init__(self, username, password):
+    contacts = []
+
+    def __init__(self, username, password, contacts):
         self.username = username
         self.password = password
+        self.contacts = contacts
 
     # store username and password in database
 
@@ -15,3 +18,7 @@ class Account:
         # account already in DB
         self.username = input("Username : ")
         self.password = input("Your password : ")
+
+    def newContact(self, contactUsername):
+        self.contacts.append(contactUsername)
+
