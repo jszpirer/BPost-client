@@ -7,8 +7,3 @@ class Message:
 
     # store username and password in database
 
-    def messageSomeone(self):
-        # print(sender.contacts)
-        # might print a list of contacts
-        self.recipient = input("Send to : ")
-        self.content = input("Write here : ")
