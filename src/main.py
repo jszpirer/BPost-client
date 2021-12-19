@@ -1,8 +1,8 @@
 import asyncio
 from Messaging.ServerConnection import ServerConnection
 
-SERVER_HOST = "127.0.0.1"
-SERVER_PORT = 6666
+SERVER_HOST = "localhost"
+SERVER_PORT = 8000
 separator = "<SEP>"
 
 
