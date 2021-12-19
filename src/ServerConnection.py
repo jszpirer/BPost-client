@@ -13,7 +13,16 @@ class ServerConnection:
         self.keep_turning = True
 
     async def start(self):
+        print("Starting server")
         await self.connect()
+
+    async def connect(self):
+        async with websockets.connect(self.uri, ssl=self.ssl_context) as ws:
+            await ws.send("Je suis un client qui me connecte")
+            await asyncio.gather(
+                self.sender_handler(ws),
+                self.receiver_handler(ws),
+            )
 
     async def sender_handler(self, ws):
         while self.keep_turning:
@@ -29,13 +38,8 @@ class ServerConnection:
             print(msg)
             # Todo : await manage message
 
-    async def connect(self):
-        async with websockets.connect(self.uri, ssl=self.ssl_context) as ws:
-            await ws.send("Je suis un client qui me connecte")
-            await asyncio.gather(
-                self.sender_handler(ws),
-                self.receiver_handler(ws),
-            )
-
     def send_message(self, message: str):
         self.messages_to_send.append(message)
+
+    def receive_message(self):
+        return self.messages_to_read

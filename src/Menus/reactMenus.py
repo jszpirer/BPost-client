@@ -1,6 +1,6 @@
 from src.Account.account import *
 from src.Messaging.message import *
-from printMenus import *
+from src.Menus.printMenus import *
 
 
 def reactTopMenu(option, connection):
@@ -23,7 +23,7 @@ def reactTopMenu(option, connection):
 def createAccount(connection):
     print("You don't have an account yet. Please enter a username and then enter a password")
     username = input("Username : ")
-    password = input("Your password : ")
+    password = input("Your password : ") # Todo : demander une deuxieme fois le mdp ?
     password = hash(password)
     toServ = [username, password]  # info to send to the server
     if authenticate("newAccount", toServ, connection):
@@ -86,8 +86,8 @@ def addContact(acc, connection):
 
 def authenticate(action, toServer, connection):
     # format with the action !
-    connection.sendMessage(toServer)
-    state = connection.receiveMessage()
+    connection.send_message(toServer)
+    state = connection.receive_message()
     if state:
         return True
     else:
