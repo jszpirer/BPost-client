@@ -1,6 +1,7 @@
 import asyncio
 from Messaging.ServerConnection import ServerConnection
-from menus import *
+from Menus.printMenus import *
+from Menus.reactMenus import *
 
 
 SERVER_HOST = "127.0.0.1"
@@ -13,12 +14,14 @@ async def main():
     await serverconn.receiveMessage()
 
     print("Welcome in BPost-Client")
-    printTopMenu() # choice between creating an account or log in
-    try:
-        optionTop = int(input("Enter your choice : "))
-    except:
-        print("Wrong input. Please enter a number")
-    reactTopMenu(optionTop)
+    printTopMenu()  # choice between creating an account or log in
+    while True :
+        try:
+            optionTop = int(input("Enter your choice : "))
+            break
+        except:
+            print("Wrong input. Please enter a number")
+    reactTopMenu(optionTop, serverconn)
 
 
 if __name__ == '__main__':

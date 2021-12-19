@@ -19,3 +19,7 @@ class ServerConnection:
             if message is None:
                 break
             print(message)
+
+    def manageMessage(self):
+        # TODO
+        print("envoyer")
