@@ -67,7 +67,15 @@ async def reactActionMenu(option, acc, connection):
         acc = await changePassword(acc, connection)
     else:
         print("Invalid option. Please enter a number between 1 and 2")
-
+    printActionMenu()
+    while True:
+        try:
+            action = await ainput("Enter your choice : ")
+            action = int(action)
+            break
+        except:
+            print("Wrong input. Please enter a number")
+    await reactActionMenu(action, acc, connection)
 
 async def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
