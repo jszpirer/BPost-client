@@ -74,7 +74,7 @@ def sendMessage(acc, connection):
         mess = Message(acc.getUsername(), recipient, content)
     else:
         print("This person does not exist in our database. Please try again.")
-        # TODO : try again
+        sendMessage(acc, connection)
     return mess
 
 
@@ -86,7 +86,7 @@ def addContact(acc, connection):
         print("Contact successfully added to your list")
     else:
         print("This person does not exist in our database. Please try again.")
-        # TODO : try again
+        addContact(acc, connection)
 
 
 def authenticate(action, toServer, connection):
