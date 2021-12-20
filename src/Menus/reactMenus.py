@@ -63,9 +63,10 @@ async def reactActionMenu(option, acc, connection):
         toServ = await sendMessage(acc, connection)
     elif option == 2:  # add a contact to the contact list
         await addContact(acc, connection)
+    elif option == 3:  # change password
+        acc = await changePassword(acc, connection)
     else:
         print("Invalid option. Please enter a number between 1 and 2")
-    return toServ
 
 
 async def sendMessage(acc, connection):
@@ -92,9 +93,30 @@ async def addContact(acc, connection):
         await addContact(acc, connection)
 
 
+async def changePassword(acc, connection):
+    oldPassword = await ainput("Current password : ")
+    if hash(oldPassword) == acc.password:
+        newPassword = await ainput("New password : ")
+        confNewPassword = await ainput("Please confirm your new password : ")
+        if newPassword == confNewPassword:
+            newPassword = hash(newPassword)
+            toServ = [hash(oldPassword), newPassword]
+            if confirmationServ("3", connection):
+                print("Password successfully modified")
+                acc = Account(acc.getUsername(), newPassword)
+                return acc
+        else:
+            print("Passwords don't match")
+            await changePassword(acc, connection)
+    else:
+        print("Your password is incorrect. Please try again")
+        await changePassword(acc, connection)
+
+
 def confirmationServ(action, connection):
     """checks the answer of the server to the action request (username correct, etc)"""
-    configMessages = connection.getConfigMessages()
+    # configMessages = connection.getConfigMessages()
+    configMessages = [("2", True), ("1", True), ("3", True)]
     read = False
     while read == False:
         for i in range(len(configMessages)):
