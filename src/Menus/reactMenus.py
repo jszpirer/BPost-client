@@ -123,8 +123,7 @@ async def changePassword(acc, connection):
 
 def confirmationServ(action, connection):
     """checks the answer of the server to the action request (username correct, etc)"""
-    # configMessages = connection.getConfigMessages()
-    configMessages = [("2", True), ("1", True), ("3", True)]
+    configMessages = connection.getConfigMessages()
     read = False
     while read == False:
         for i in range(len(configMessages)):
