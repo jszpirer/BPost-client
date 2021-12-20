@@ -1,6 +1,7 @@
 import asyncio
 from Menus.printMenus import *
 from Menus.reactMenus import *
+from asyncronous_functions import *
 
 from ServerConnection import ServerConnection
 
@@ -16,7 +17,8 @@ async def start_menu(server_conn):
     printTopMenu()  # choice between creating an account or log in
     while True:
         try:
-            optionTop = int(input("Enter your choice : "))
+            optionTop = await ainput("Enter your choice : ")
+            optionTop = int(optionTop)
             break
         except:
             print("Wrong input. Please enter a number")
