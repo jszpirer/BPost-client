@@ -33,10 +33,11 @@ def createAccount(connection):
     toServ = [username, password]  # info to send to the server
     if authenticate("newAccount", toServ, connection):
         print("You have successfully created you BPost Account !")
-        login(connection)
+        acc = login(connection)
+        return acc
     else:
         print("This username already exists. Please choose a different username")
-        createAccount(connection)
+        return createAccount(connection)
 
 
 def login(connection):
@@ -49,10 +50,11 @@ def login(connection):
     if authenticate("login", toServ, connection):
         print("Login successful")
         acc = Account(username, password)
+        return acc
     else:
         print("Your username or password is incorrect. Please try again")
-        login(connection)
-    return acc
+        return login(connection)
+
 
 
 def reactActionMenu(option, acc, connection):
@@ -72,10 +74,11 @@ def sendMessage(acc, connection):
     toServ = recipient
     if authenticate("sendMessage", toServ, connection):
         mess = Message(acc.getUsername(), recipient, content)
+        return mess
     else:
         print("This person does not exist in our database. Please try again.")
-        sendMessage(acc, connection)
-    return mess
+        return sendMessage(acc, connection)
+
 
 
 def addContact(acc, connection):
