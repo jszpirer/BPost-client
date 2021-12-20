@@ -23,15 +23,20 @@ def reactTopMenu(option, connection):
 def createAccount(connection):
     print("You don't have an account yet. Please enter a username and then enter a password")
     username = input("Username : ")
-    password = input("Your password : ") # Todo : demander une deuxieme fois le mdp ?
-    password = hash(password)
+    password = input("Your password : ")
+    confPassword = input("Please confirm your password : ")
+    if password == confPassword:
+        password = hash(password)
+    else:
+        print("Passwords don't match")
+        # TODO : passwords don't match
     toServ = [username, password]  # info to send to the server
     if authenticate("newAccount", toServ, connection):
         print("You have successfully created you BPost Account !")
         login(connection)
     else:
         print("This username already exists. Please choose a different username")
-        # TODO : try again
+        createAccount(connection)
 
 
 def login(connection):
@@ -46,7 +51,7 @@ def login(connection):
         acc = Account(username, password)
     else:
         print("Your username or password is incorrect. Please try again")
-        # TODO : try again
+        login(connection)
     return acc
 
 
@@ -92,4 +97,3 @@ def authenticate(action, toServer, connection):
         return True
     else:
         return False
-
