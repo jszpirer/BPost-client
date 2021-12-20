@@ -1,7 +1,7 @@
 from src.Account.account import *
 from src.Messaging.message import *
 from src.Menus.printMenus import *
-
+from src.asyncronous_functions import *
 
 def reactTopMenu(option, connection):
     if option == 1:  # create account
@@ -13,7 +13,8 @@ def reactTopMenu(option, connection):
     printActionMenu()
     while True:
         try:
-            action = int(input("Enter your choice : "))
+            action = await ainput("Enter your choice : ")
+            action = int(action)
             break
         except:
             print("Wrong input. Please enter a number")
@@ -22,9 +23,9 @@ def reactTopMenu(option, connection):
 
 def createAccount(connection):
     print("You don't have an account yet. Please enter a username and then enter a password")
-    username = input("Username : ")
-    password = input("Your password : ")
-    confPassword = input("Please confirm your password : ")
+    username = await ainput("Username : ")
+    password = await ainput("Your password : ")
+    confPassword = await ainput("Please confirm your password : ")
     if password == confPassword:
         password = hash(password)
     else:
@@ -43,8 +44,8 @@ def createAccount(connection):
 def login(connection):
     print("Welcome back to the BPost Messaging App !")
     print("Please enter your username and then enter your password")
-    username = input("Username : ")
-    password = input("Your password : ")
+    username = await ainput("Username : ")
+    password = await ainput("Your password : ")
     password = hash(password)
     toServ = [username, password]  # info to send to the server !! formatage
     if authenticate("login", toServ, connection):
@@ -69,8 +70,8 @@ def reactActionMenu(option, acc, connection):
 
 def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
-    recipient = input("Send to : ")
-    content = input("Write here : ")
+    recipient = await ainput("Send to : ")
+    content = await ainput("Write here : ")
     toServ = recipient
     if authenticate("sendMessage", toServ, connection):
         mess = Message(acc.getUsername(), recipient, content)
@@ -82,7 +83,7 @@ def sendMessage(acc, connection):
 
 
 def addContact(acc, connection):
-    contact = input("What is the username of the contact you would like to add to your list : ")
+    contact = await ainput("What is the username of the contact you would like to add to your list : ")
     toServ = contact
     if authenticate("add Contact to list", toServ, connection):  # contact exists?
         acc.newContact(contact)
