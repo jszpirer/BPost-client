@@ -83,7 +83,6 @@ class Database:
     def select_common_key(self, username1, username2):
         """We want to select the common key between username1 and username2. If it doesn't exist, the string
         to return will be empty."""
-        string_to_return = list()
         self.__open_connection()
         sql_select = """SELECT common_key FROM common_keys WHERE username1 = '""" + username1 + """' AND username2 = 
         '"""+username2+"""; """
