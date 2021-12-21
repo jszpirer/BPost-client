@@ -11,7 +11,7 @@ async def reactTopMenu(option, connection):
     if option == 1:  # create account
         acc = await createAccount(connection)
     elif option == 2:  # login
-        acc = await login(connection)
+        acc = await authenticate(connection)
     else:
         print("Invalid option. Please enter a number between 1 and 2")
     printActionMenu()
@@ -75,21 +75,23 @@ async def createAccount(connection):
     connection.send_message(formatted_request)
     if confirmationServ("1", connection):
         print("You have successfully created you BPost Account !")
-        acc = await login(connection)
+        acc = await authenticate(connection)
+        # Since it is the first connexion of the server we need to send the public key
         return acc
     else:
         print("This username already exists. Please choose a different username")
         return await createAccount(connection)
 
 
-async def login(connection):
+async def authenticate(connection):
     print("Welcome back to the BPost Messaging App !")
     print("Please enter your username and then enter your password")
-    username = await ainput("Username : ")
-    password = await ainput("Your password : ")
-    password = hash(password)
-    toServ = [username, password]
-    formatted_request = format_login_request(toServ)
+    return await login_on_serv(connection)
+
+
+async def login_on_serv(connection):
+    username, password = await get_user_identification()
+    formatted_request = format_login_request([username, password])
     connection.send_message(formatted_request)
     if confirmationServ("2", connection):
         print("Login successful")
@@ -97,7 +99,14 @@ async def login(connection):
         return acc
     else:
         print("Your username or password is incorrect. Please try again")
-        return await login(connection)
+        return await login_on_serv(connection)
+
+
+async def get_user_identification():
+    username = await ainput("Username : ")
+    password = await ainput("Your password : ")
+    password = hash(password)
+    return username, password
 
 
 async def changePassword(acc, connection):
