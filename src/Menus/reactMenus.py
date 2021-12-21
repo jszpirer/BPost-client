@@ -2,6 +2,7 @@ from src.Account.account import *
 from src.Messaging.message import *
 from src.Menus.printMenus import *
 from src.asyncronous_functions import *
+from src.format import *
 
 sep = "<SEP>"
 
@@ -24,42 +25,6 @@ async def reactTopMenu(option, connection):
     await reactActionMenu(action, acc, connection)
 
 
-async def createAccount(connection):
-    print("You don't have an account yet. Please enter a username and then enter a password")
-    username = await ainput("Username : ")
-    password = await ainput("Your password : ")
-    confPassword = await ainput("Please confirm your password : ")
-    if password == confPassword:
-        password = hash(password)
-    else:
-        print("Passwords don't match")
-        return await createAccount(connection)
-    toServ = [1, username, password]  # info to send to the server
-    if confirmationServ("2", connection):
-        print("You have successfully created you BPost Account !")
-        acc = await login(connection)
-        return acc
-    else:
-        print("This username already exists. Please choose a different username")
-        return await createAccount(connection)
-
-
-async def login(connection):
-    print("Welcome back to the BPost Messaging App !")
-    print("Please enter your username and then enter your password")
-    username = await ainput("Username : ")
-    password = await ainput("Your password : ")
-    password = hash(password)
-    toServ = [2, username, password]  # info to send to the server !! formatage
-    if confirmationServ(toServ, connection):
-        print("Login successful")
-        acc = Account(username, password)
-        return acc
-    else:
-        print("Your username or password is incorrect. Please try again")
-        return await login(connection)
-
-
 async def reactActionMenu(option, acc, connection):
     if option == 1:  # send a message
         toServ = await sendMessage(acc, connection)
@@ -79,11 +44,14 @@ async def reactActionMenu(option, acc, connection):
             print("Wrong input. Please enter a number")
     await reactActionMenu(action, acc, connection)
 
+
 async def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
     recipient = await ainput("Send to : ")
     content = await ainput("Write here : ")
-    toServ = recipient
+    toServ = [acc.getUsername(), content, recipient]
+    formatted_request = format_send_message(toServ)
+    connection.send_message(formatted_request)
     if confirmationServ("0", connection):
         mess = Message(acc.getUsername(), recipient, content)
         return mess
@@ -92,15 +60,44 @@ async def sendMessage(acc, connection):
         return await sendMessage(acc, connection)
 
 
-async def addContact(acc, connection):
-    contact = await ainput("What is the username of the contact you would like to add to your list : ")
-    toServ = [4, acc.getUsername(),contact]
-    if confirmationServ(toServ, connection):
-        acc.newContact(contact)
-        print("Contact successfully added to your list")
+async def createAccount(connection):
+    print("You don't have an account yet. Please enter a username and then enter a password")
+    username = await ainput("Username : ")
+    password = await ainput("Your password : ")
+    confPassword = await ainput("Please confirm your password : ")
+    if password == confPassword:
+        password = hash(password)
     else:
-        print("This person does not exist in our database. Please try again.")
-        await addContact(acc, connection)
+        print("Passwords don't match")
+        return await createAccount(connection)
+    toServ = [username, password]  # info to send to the server
+    formatted_request = format_new_account(toServ)
+    connection.send_message(formatted_request)
+    if confirmationServ("1", connection):
+        print("You have successfully created you BPost Account !")
+        acc = await login(connection)
+        return acc
+    else:
+        print("This username already exists. Please choose a different username")
+        return await createAccount(connection)
+
+
+async def login(connection):
+    print("Welcome back to the BPost Messaging App !")
+    print("Please enter your username and then enter your password")
+    username = await ainput("Username : ")
+    password = await ainput("Your password : ")
+    password = hash(password)
+    toServ = [username, password]
+    formatted_request = format_login_request(toServ)
+    connection.send_message(formatted_request)
+    if confirmationServ("2", connection):
+        print("Login successful")
+        acc = Account(username, password)
+        return acc
+    else:
+        print("Your username or password is incorrect. Please try again")
+        return await login(connection)
 
 
 async def changePassword(acc, connection):
@@ -110,7 +107,9 @@ async def changePassword(acc, connection):
         confNewPassword = await ainput("Please confirm your new password : ")
         if newPassword == confNewPassword:
             newPassword = hash(newPassword)
-            toServ = [hash(oldPassword), newPassword]
+            toServ = [acc.getUsername(), hash(oldPassword), newPassword]
+            formatted_request = format_change_password(toServ)
+            connection.send_message(formatted_request)
             if confirmationServ("3", connection):
                 print("Password successfully modified")
                 acc = Account(acc.getUsername(), newPassword)
@@ -121,6 +120,19 @@ async def changePassword(acc, connection):
     else:
         print("Your password is incorrect. Please try again")
         await changePassword(acc, connection)
+
+
+async def addContact(acc, connection):
+    contact = await ainput("What is the username of the contact you would like to add to your list : ")
+    toServ = [acc.getUsername(), contact]
+    formatted_request = format_add_contact(toServ)
+    connection.send_message(formatted_request)
+    if confirmationServ("4", connection):
+        acc.newContact(contact)
+        print("Contact successfully added to your list")
+    else:
+        print("This person does not exist in our database. Please try again.")
+        await addContact(acc, connection)
 
 
 def confirmationServ(action, connection):
@@ -136,61 +148,3 @@ def confirmationServ(action, connection):
     return confirmation
 
 
-def inverse_format(from_server):
-    """Recognizes action from the server and says whether it should execute"""
-    input = from_server.split(sep)
-    action = input[0]
-    bool = input[1]
-    if bool:
-        if action == 0:
-            return "message was sent"
-        elif action == 1:
-            return "user logged in"
-        elif action == 2:
-            return "account created"
-        elif action == 3:
-            return "password changed"
-        elif action == 4:
-            return "contact added"
-        elif action == 5:
-            """server is sending a message to a client"""
-            mess = input[1]
-            recip = input[2]
-            return mess+"<SEP>"+recip
-        else:
-            print("action was not an int between 0 and 4")
-        return
-    else:
-        print("error action "+str(action))
-
-
-def format_send_message(to_server):  #send
-    sender = to_server[0]
-    message = to_server[1]
-    recipient = to_server[2]
-    return str(0)+sep+sender+sep+message+sep+recipient
-
-
-def format_login_request(to_server):  #auth
-    username = to_server[0]
-    password = to_server[1]
-    return str(1)+sep+username+sep+password
-
-
-def format_new_account(to_server):  #new acc
-    username = to_server[0]
-    password = to_server[1]
-    return str(2) +sep+ username +sep+ password
-
-
-def format_change_password(to_server):  #change pwd
-    username = to_server[0]
-    curr_password = to_server[1]
-    new_password = to_server[2]
-    return str(3) +sep+ username +sep+ curr_password +sep+ new_password
-
-
-def format_add_contact(to_server):  #new contact
-    username = to_server[0]
-    contact = to_server[1]
-    return str(4) +sep+ username +sep+ contact
