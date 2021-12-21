@@ -92,6 +92,7 @@ async def sendMessage(acc, connection):
 
 async def addContact(acc, connection):
     contact = await ainput("What is the username of the contact you would like to add to your list : ")
+    # Todo : setup common secret key
     toServ = contact
     if confirmationServ("4", connection):
         acc.newContact(contact)
