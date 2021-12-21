@@ -5,7 +5,7 @@ BPost is a Messaging App implemented for the project of the Communication Networ
 # Execute
 To launch the client part of the project, first launch the server (cf. BPost-server repository : https://github.com/AFlachs/BPost-server)
 
-To open a client session, execute the file src/main.py with a Python Virtual Environment. 
+To open a client session, execute the file src/main.py with a Python Virtual Environment. Careful that a user can log in on one device only.
 
 All modules used in the App are listed in the requirements.txt document.
 
