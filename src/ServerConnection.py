@@ -1,6 +1,7 @@
 import websockets
 import asyncio
 import ssl
+import src.format as format
 
 
 class ServerConnection:
@@ -8,7 +9,8 @@ class ServerConnection:
     def __init__(self, server_url, server_port):
         self.uri = f"wss://{server_url}:{server_port}"
         self.ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        self.messages_to_read = list()
+        self.private_messages = list()  # list of pairs (sender_username: str, message: str)
+        self.server_responses = list()  # list of pairs (action_type: int, result: bool)
         self.messages_to_send = list()
         self.keep_turning = True
 
@@ -18,7 +20,6 @@ class ServerConnection:
 
     async def connect(self):
         async with websockets.connect(self.uri, ssl=self.ssl_context) as ws:
-            await ws.send("Je suis un client qui me connecte")
             await asyncio.gather(
                 self.sender_handler(ws),
                 self.receiver_handler(ws),
@@ -33,13 +34,16 @@ class ServerConnection:
             await asyncio.sleep(0.01)
 
     async def receiver_handler(self, ws):
-        async for msg in ws:
-            self.messages_to_read.append(msg)
-            print(msg)
-            # Todo : await manage message
+        async for order in ws:
+            if format.order_is_confirmation(order):
+                print("Ajouté dans les réponses serveur")
+                self.server_responses.append(format.inverse_format(order))
+            else:
+                print("Ajouté message privé reçu")
+                self.private_messages.append(format.inverse_format(order))
+
+            print(order)
 
     def send_message(self, message: str):
+        print("Added message to send")
         self.messages_to_send.append(message)
-
-    def receive_message(self):
-        return self.messages_to_read

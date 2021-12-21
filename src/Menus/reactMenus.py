@@ -3,6 +3,8 @@ from src.Messaging.message import *
 from src.Menus.printMenus import *
 from src.asyncronous_functions import *
 from src.format import *
+from src.ServerConnection import ServerConnection
+from src.Crypt.crypto import hash_pswd
 
 sep = "<SEP>"
 
@@ -52,7 +54,7 @@ async def sendMessage(acc, connection):
     toServ = [acc.getUsername(), content, recipient]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
-    if confirmationServ("0", connection):
+    if confirmationServ(0, connection):
         mess = Message(acc.getUsername(), recipient, content)
         return mess
     else:
@@ -66,16 +68,17 @@ async def createAccount(connection):
     password = await ainput("Your password : ")
     confPassword = await ainput("Please confirm your password : ")
     if password == confPassword:
-        password = hash(password)
+        print("Password not hashed", password)
+        password = hash_pswd(password)
     else:
         print("Passwords don't match")
         return await createAccount(connection)
     toServ = [username, password]  # info to send to the server
     formatted_request = format_new_account(toServ)
     connection.send_message(formatted_request)
-    if confirmationServ("1", connection):
+    if await confirmationServ(2, connection):
         print("You have successfully created you BPost Account !")
-        acc = await authenticate(connection)
+        acc = Account(username, password)
         # Since it is the first connexion of the server we need to send the public key
         pub_key = acc.dh.public_key
         connection.send_message(format_public_key_announcment(acc.getUsername(), pub_key))
@@ -88,40 +91,42 @@ async def createAccount(connection):
 async def authenticate(connection):
     print("Welcome back to the BPost Messaging App !")
     print("Please enter your username and then enter your password")
-    return await login_on_serv(connection)
-
-
-async def login_on_serv(connection):
     username, password = await get_user_identification()
+    print(password)
+    return await login_on_serv(connection, username, password)
+
+
+async def login_on_serv(connection, username, password):
     formatted_request = format_login_request([username, password])
     connection.send_message(formatted_request)
-    if confirmationServ("2", connection):
+    if await confirmationServ(1, connection):
         print("Login successful")
         acc = Account(username, password)
         return acc
     else:
         print("Your username or password is incorrect. Please try again")
-        return await login_on_serv(connection)
+        return await authenticate(connection)
 
 
 async def get_user_identification():
     username = await ainput("Username : ")
     password = await ainput("Your password : ")
-    password = hash(password)
+    print("password not hashed", password)
+    password = hash_pswd(password)
     return username, password
 
 
 async def changePassword(acc, connection):
     oldPassword = await ainput("Current password : ")
-    if hash(oldPassword) == acc.password:
+    if hash_pswd(oldPassword) == acc.password:
         newPassword = await ainput("New password : ")
         confNewPassword = await ainput("Please confirm your new password : ")
         if newPassword == confNewPassword:
-            newPassword = hash(newPassword)
-            toServ = [acc.getUsername(), hash(oldPassword), newPassword]
+            newPassword = hash_pswd(newPassword)
+            toServ = [acc.getUsername(), hash_pswd(oldPassword), newPassword]
             formatted_request = format_change_password(toServ)
             connection.send_message(formatted_request)
-            if confirmationServ("3", connection):
+            if confirmationServ(3, connection):
                 print("Password successfully modified")
                 acc = Account(acc.getUsername(), newPassword)
                 return acc
@@ -138,7 +143,7 @@ async def addContact(acc, connection):
     toServ = [acc.getUsername(), contact]
     formatted_request = format_add_contact(toServ)
     connection.send_message(formatted_request)
-    if confirmationServ("4", connection):
+    if confirmationServ(4, connection):
         acc.newContact(contact)
         print("Contact successfully added to your list")
     else:
@@ -146,16 +151,12 @@ async def addContact(acc, connection):
         await addContact(acc, connection)
 
 
-def confirmationServ(action, connection):
+async def confirmationServ(action: int, connection: ServerConnection):
     """checks the answer of the server to the action request (username correct, etc)"""
-    configMessages = connection.getConfigMessages()
-    read = False
-    while read == False:
-        for i in range(len(configMessages)):
-            if configMessages[i][0] == action:  # checks the action value
-                confirmation = configMessages[i][1]
-                print("ca marche")
-                read = True
-    return confirmation
-
-
+    while True:
+        for order_response in connection.server_responses:
+            print(order_response)
+            if order_response[0] == action:  # checks the action value
+                connection.server_responses.remove(order_response)
+                return order_response[1]
+        await asyncio.sleep(1)

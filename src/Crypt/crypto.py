@@ -1,5 +1,6 @@
-from diffhellm import build
+from src.Crypt.diffhellm import build
 import base64
+import hashlib
 
 from cryptography.fernet import Fernet
 
@@ -20,3 +21,9 @@ def encrypt_msg(fern: Fernet, msg):
 
 def decrypt_str_msg(fern: Fernet, tok):
     return str(fern.decrypt(tok), 'utf-8')
+
+
+def hash_pswd(password: str):
+    res = hashlib.md5(password.encode('utf-8'))
+    print(res.hexdigest())
+    return res.hexdigest()
