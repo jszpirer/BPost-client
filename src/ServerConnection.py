@@ -9,7 +9,7 @@ class ServerConnection:
     def __init__(self, server_url, server_port):
         self.uri = f"wss://{server_url}:{server_port}"
         self.ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        self.private_messages = list()  # list of pairs (sender_username: str, message: str)
+        self.private_messages = dict()  # list of dict (sender_username: str, received_messages: list)
         self.server_responses = list()  # list of pairs (action_type: int, result: bool)
         self.messages_to_send = list()
         self.keep_turning = True
@@ -39,7 +39,11 @@ class ServerConnection:
                 self.server_responses.append(format.inverse_format(order))
             else:
                 print("Added to private message")
-                self.private_messages.append(format.inverse_format(order))
+                sender, content = format.inverse_format(order)
+                if sender in self.private_messages:
+                    self.private_messages[sender].append(content)
+                else:
+                    self.private_messages[sender] = [content]
             print(order)
 
     def send_message(self, message: str):

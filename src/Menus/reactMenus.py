@@ -16,7 +16,7 @@ async def reactTopMenu(option, connection):
         acc = await authenticate(connection)
     else:
         print("Invalid option. Please enter a number between 1 and 2")
-    printActionMenu()
+    printActionMenu(connection)
     while True:
         try:
             action = await ainput("Enter your choice : ")
@@ -27,39 +27,56 @@ async def reactTopMenu(option, connection):
     await reactActionMenu(action, acc, connection)
 
 
+async def read_messages(connection):
+    messages = connection.private_messages
+    for sender in messages:
+        print(sender + " (" + str(len(connection.private_messages)) + ")")
+    rep = await ainput("Which conversation do you want to read (enter username) :")
+    while rep not in messages:
+        rep = await ainput("Username not valid, try again :")
+    for m in messages.pop(rep):
+        print(m)
+    await ainput("Enter to continue")
+
+
 async def reactActionMenu(option, acc, connection):
     if option == 1:  # send a message
-        toServ = await sendMessage(acc, connection)
+        await sendMessage(acc, connection)
     elif option == 2:  # add a contact to the contact list
         await addContact(acc, connection)
     elif option == 3:  # change password
         acc = await changePassword(acc, connection)
+    elif option == 4:  # Read messages
+        await read_messages(connection)
+    elif option == 5:  # Exit program
+        return
     else:
         print("Invalid option. Please enter a number between 1 and 2")
-    printActionMenu()
+    printActionMenu(connection)
     while True:
         try:
             action = await ainput("Enter your choice : ")
             action = int(action)
             break
         except:
-            print("Wrong input. Please enter a number")
+            print("Wrong input. Please enter a valid number")
     await reactActionMenu(action, acc, connection)
 
 
 async def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
-    recipient = await ainput("Send to : ")
+    dest = ''
+    while dest not in acc.contacts:
+        dest = await ainput("Send to : ")
     content = await ainput("Write here : ")
-    toServ = [acc.getUsername(), content, recipient]
+    toServ = [acc.getUsername(), content, dest]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
     if await confirmationServ(0, connection):
-        mess = Message(acc.getUsername(), recipient, content)
-        return mess
+        mess = Message(acc.getUsername(), dest, content)
     else:
         print("This person does not exist in our database. Please try again.")
-        return await sendMessage(acc, connection)
+        await sendMessage(acc, connection)
 
 
 async def createAccount(connection):

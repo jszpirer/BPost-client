@@ -22,6 +22,7 @@ async def start_menu(server_conn):
         except:
             print("Wrong input. Please enter a number")
     await reactTopMenu(optionTop, server_conn)
+    quit()
 
 
 async def main():

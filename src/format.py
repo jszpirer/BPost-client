@@ -41,6 +41,10 @@ def inverse_format(from_server):
     input = from_server.split(sep)
     action = int(input[0])
     strbool = input[1]  # "True"
+    if action == 4 and strbool == "OK":
+        bool_res = True if strbool == "OK" else False
+        # Return la clef publique de l'autre
+        return action, bool_res, input[2]  # TODO vérifier le type de la clef publique de l'autre
     if action in range(5):
         bool_res = True if strbool == "OK" else False
         return action, bool_res
