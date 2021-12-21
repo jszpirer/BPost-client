@@ -63,10 +63,10 @@ class Database:
         data = self.cursor.fetchall()
         self.__close_connection()
         if len(data) == 0:
-            print('There is no common key :'%common_key)
+            print('There is no common key :' + common_key)
             return False
         else:
-            print('Common key '+ common_key+' found.')
+            print('Common key ' + common_key + ' found.')
             return True
 
     def select_contact_list(self, username):
@@ -77,7 +77,7 @@ class Database:
         self.cursor.execute(sql_select)
         data = self.cursor.fetchall()
         for row in data:
-            list_to_return.append(row)
+            list_to_return.append(row[0])
         return list_to_return
 
     def select_common_key(self, username1, username2):
@@ -85,7 +85,7 @@ class Database:
         to return will be empty."""
         self.__open_connection()
         sql_select = """SELECT common_key FROM common_keys WHERE username1 = '""" + username1 + """' AND username2 = 
-        '"""+username2+"""; """
+        '"""+username2+"""'; """
         self.cursor.execute(sql_select)
         data = self.cursor.fetchall()
         string_to_return = data[0][0]

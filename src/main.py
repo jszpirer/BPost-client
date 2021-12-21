@@ -12,7 +12,6 @@ separator = "<SEP>"
 
 async def start_menu(server_conn):
     print("Starting menu")
-    # Todo
     printTopMenu()  # choice between creating an account or log in
     while True:
         try:

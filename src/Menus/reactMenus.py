@@ -1,3 +1,5 @@
+import asyncio
+
 from Account.account import *
 from Messaging.message import *
 from Menus.printMenus import *
@@ -5,6 +7,7 @@ from asyncronous_functions import *
 from format import *
 from ServerConnection import ServerConnection
 from Crypt.crypto import hash_pswd
+from Crypt.crypto import encrypt_msg
 
 sep = "<SEP>"
 
@@ -27,15 +30,25 @@ async def reactTopMenu(option, connection):
     await reactActionMenu(action, acc, connection)
 
 
-async def read_messages(connection):
+def decrypt_message(receiver, sender, m):
+    fernet = receiver.contact_fernets[sender]
+    return crpt.decrypt_str_msg(fernet, m)
+
+
+async def read_messages(acc, connection):
     messages = connection.private_messages
     for sender in messages:
         print(sender + " (" + str(len(connection.private_messages)) + ")")
-    rep = await ainput("Which conversation do you want to read (enter username) :")
-    while rep not in messages:
-        rep = await ainput("Username not valid, try again :")
-    for m in messages.pop(rep):
-        print(m)
+    sender = await ainput("Which conversation do you want to read (enter username) :")
+    while sender not in messages:
+        sender = await ainput("Username not valid, try again :")
+    if sender not in acc.contacts:
+        print("The sender of the message is not in your contact list, adding it so you can read the message")
+        await add_contact(acc, connection, sender)
+    for m in messages.pop(sender):
+        # Decrypting messages
+        msg = decrypt_message(acc, sender, m)
+        print(sender + ": " + msg)
     await ainput("Enter to continue")
 
 
@@ -43,11 +56,11 @@ async def reactActionMenu(option, acc, connection):
     if option == 1:  # send a message
         await sendMessage(acc, connection)
     elif option == 2:  # add a contact to the contact list
-        await addContact(acc, connection)
+        await askContact(acc, connection)
     elif option == 3:  # change password
         acc = await changePassword(acc, connection)
     elif option == 4:  # Read messages
-        await read_messages(connection)
+        await read_messages(acc, connection)
     elif option == 5:  # Exit program
         return
     else:
@@ -63,12 +76,18 @@ async def reactActionMenu(option, acc, connection):
     await reactActionMenu(action, acc, connection)
 
 
+def encrypt(sender, dest, content):
+    fernet = sender.contact_fernets[dest]
+    return crpt.encrypt_msg(fernet, content)
+
+
 async def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
     dest = ''
     while dest not in acc.contacts:
         dest = await ainput("Send to : ")
     content = await ainput("Write here : ")
+    content = encrypt(acc, dest, content)
     toServ = [acc.getUsername(), content, dest]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
@@ -152,17 +171,31 @@ async def changePassword(acc, connection):
         await changePassword(acc, connection)
 
 
-async def addContact(acc, connection):
+async def askContact(acc, connection):
     contact = await ainput("What is the username of the contact you would like to add to your list : ")
+    await add_contact(acc, connection, contact)
+
+
+async def add_contact(acc, connection, contact):
     toServ = [acc.getUsername(), contact]
     formatted_request = format_add_contact(toServ)
     connection.send_message(formatted_request)
-    if await confirmationServ(4, connection):
-        acc.newContact(contact)
+    validation, contact_pub_key = await confirmation_new_contact(connection)
+    if validation:
+        acc.newContact(contact, contact_pub_key)
         print("Contact successfully added to your list")
     else:
         print("This person does not exist in our database. Please try again.")
-        await addContact(acc, connection)
+        await askContact(acc, connection)
+
+
+async def confirmation_new_contact(connection: ServerConnection):
+    while True:
+        for order_response in connection.server_responses:
+            if order_response[0] == 4:  # Réponse d'un ajout de contact
+                connection.server_responses.remove(order_response)
+                return order_response[1], order_response[2]
+        await asyncio.sleep(0.1)
 
 
 async def confirmationServ(action: int, connection: ServerConnection):
@@ -173,4 +206,4 @@ async def confirmationServ(action: int, connection: ServerConnection):
             if order_response[0] == action:  # checks the action value
                 connection.server_responses.remove(order_response)
                 return order_response[1]
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)

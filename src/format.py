@@ -1,10 +1,12 @@
 sep = "<SEP>"
 
+
 def format_send_message(to_server):  #send
     sender = to_server[0]
     message = to_server[1]
     recipient = to_server[2]
-    return str(0)+sep+sender+sep+message+sep+recipient
+    print("message", message)
+    return str(0)+sep+sender+sep+str(message)+sep+recipient
 
 
 def format_login_request(to_server):  #auth
@@ -41,10 +43,13 @@ def inverse_format(from_server):
     input = from_server.split(sep)
     action = int(input[0])
     strbool = input[1]  # "True"
-    if action == 4 and strbool == "OK":
+    if action == 4:
         bool_res = True if strbool == "OK" else False
         # Return la clef publique de l'autre
-        return action, bool_res, input[2]  # TODO vérifier le type de la clef publique de l'autre
+        if bool_res:
+            return action, bool_res, input[2]  # TODO vérifier le type de la clef publique de l'autre
+        else:
+            return action, bool_res, "no_key"
     if action in range(5):
         bool_res = True if strbool == "OK" else False
         return action, bool_res
