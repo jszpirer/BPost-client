@@ -77,6 +77,8 @@ async def createAccount(connection):
         print("You have successfully created you BPost Account !")
         acc = await authenticate(connection)
         # Since it is the first connexion of the server we need to send the public key
+        pub_key = acc.dh.public_key
+        connection.send_message(format_public_key_announcment(acc.getUsername(), pub_key))
         return acc
     else:
         print("This username already exists. Please choose a different username")

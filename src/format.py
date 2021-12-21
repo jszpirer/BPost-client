@@ -32,6 +32,10 @@ def format_add_contact(to_server):  #new contact
     return str(4)+sep+username+sep+contact
 
 
+def format_public_key_announcment(username, pub_key):
+    return str(6)+sep+username+sep+pub_key
+
+
 def inverse_format(from_server):
     """Recognizes action from the server and says whether it should execute"""
     input = from_server.split(sep)
