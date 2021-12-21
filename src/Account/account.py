@@ -1,4 +1,4 @@
-import src.Crypt.crypto as crpt
+import Crypt.crypto as crpt
 
 
 class Account:

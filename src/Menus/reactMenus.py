@@ -1,10 +1,10 @@
-from src.Account.account import *
-from src.Messaging.message import *
-from src.Menus.printMenus import *
-from src.asyncronous_functions import *
-from src.format import *
-from src.ServerConnection import ServerConnection
-from src.Crypt.crypto import hash_pswd
+from Account.account import *
+from Messaging.message import *
+from Menus.printMenus import *
+from asyncronous_functions import *
+from format import *
+from ServerConnection import ServerConnection
+from Crypt.crypto import hash_pswd
 
 sep = "<SEP>"
 
@@ -54,7 +54,7 @@ async def sendMessage(acc, connection):
     toServ = [acc.getUsername(), content, recipient]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
-    if confirmationServ(0, connection):
+    if await confirmationServ(0, connection):
         mess = Message(acc.getUsername(), recipient, content)
         return mess
     else:
@@ -68,7 +68,6 @@ async def createAccount(connection):
     password = await ainput("Your password : ")
     confPassword = await ainput("Please confirm your password : ")
     if password == confPassword:
-        print("Password not hashed", password)
         password = hash_pswd(password)
     else:
         print("Passwords don't match")
@@ -92,7 +91,6 @@ async def authenticate(connection):
     print("Welcome back to the BPost Messaging App !")
     print("Please enter your username and then enter your password")
     username, password = await get_user_identification()
-    print(password)
     return await login_on_serv(connection, username, password)
 
 
@@ -111,7 +109,6 @@ async def login_on_serv(connection, username, password):
 async def get_user_identification():
     username = await ainput("Username : ")
     password = await ainput("Your password : ")
-    print("password not hashed", password)
     password = hash_pswd(password)
     return username, password
 
@@ -143,7 +140,7 @@ async def addContact(acc, connection):
     toServ = [acc.getUsername(), contact]
     formatted_request = format_add_contact(toServ)
     connection.send_message(formatted_request)
-    if confirmationServ(4, connection):
+    if await confirmationServ(4, connection):
         acc.newContact(contact)
         print("Contact successfully added to your list")
     else:

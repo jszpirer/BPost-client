@@ -1,4 +1,4 @@
-from src.Crypt.diffhellm import build
+from Crypt.diffhellm import build
 import base64
 import hashlib
 
@@ -25,5 +25,4 @@ def decrypt_str_msg(fern: Fernet, tok):
 
 def hash_pswd(password: str):
     res = hashlib.md5(password.encode('utf-8'))
-    print(res.hexdigest())
     return res.hexdigest()

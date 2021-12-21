@@ -1,7 +1,7 @@
 import websockets
 import asyncio
 import ssl
-import src.format as format
+import format as format
 
 
 class ServerConnection:
@@ -30,20 +30,17 @@ class ServerConnection:
             for m in self.messages_to_send:
                 await ws.send(m)
                 self.messages_to_send.remove(m)
-                print("Sent message :", m)
             await asyncio.sleep(0.01)
 
     async def receiver_handler(self, ws):
         async for order in ws:
             if format.order_is_confirmation(order):
-                print("Ajouté dans les réponses serveur")
+                print("Added to responses")
                 self.server_responses.append(format.inverse_format(order))
             else:
-                print("Ajouté message privé reçu")
+                print("Added to private message")
                 self.private_messages.append(format.inverse_format(order))
-
             print(order)
 
     def send_message(self, message: str):
-        print("Added message to send")
         self.messages_to_send.append(message)
