@@ -14,7 +14,6 @@ class Account:
 
         self.contacts = self.key_database.select_contact_list(self.username)
         for contact in self.contacts:
-            print(contact, type(contact))
             shared_key = self.key_database.select_common_key(username, contact)
             self.contact_fernets[contact] = crpt.create_fernet_from_shared_key(shared_key)
 

@@ -47,9 +47,10 @@ class Database:
             print("The common key already exists.")
             return False
         else:
-            print("The pair of users doen't exist so we're gonna add it.")
+            print("The pair of users doesn't exist so we're gonna add it.")
             self.__open_connection()
-            sql_insert_client = """INSERT INTO common_keys VALUES('""" + username1 + """','""" + username2 + """','"""+common_key+"""');"""
+            sql_insert_client = """INSERT INTO common_keys
+             VALUES('""" + username1 + """','""" + username2 + """','"""+common_key+"""');"""
             self.cursor.execute(sql_insert_client)
             self.connection.commit()
             self.__close_connection()
@@ -73,19 +74,28 @@ class Database:
         """We want to return all the username2 that have a common key with username1."""
         list_to_return = list()
         self.__open_connection()
-        sql_select = """SELECT username2 FROM common_keys WHERE username1 = '""" + username + """';"""
+        sql_select = """
+            SELECT username1, username2
+            FROM common_keys
+            WHERE username1 = '""" + username + """' OR username2 = '""" + username + """';"""
         self.cursor.execute(sql_select)
         data = self.cursor.fetchall()
         for row in data:
-            list_to_return.append(row[0])
+            if row[0] == username:
+                list_to_return.append(row[1])
+            else:
+                list_to_return.append(row[0])
         return list_to_return
 
     def select_common_key(self, username1, username2):
         """We want to select the common key between username1 and username2. If it doesn't exist, the string
         to return will be empty."""
         self.__open_connection()
-        sql_select = """SELECT common_key FROM common_keys WHERE username1 = '""" + username1 + """' AND username2 = 
-        '"""+username2+"""'; """
+        sql_select = """
+        SELECT common_key
+         FROM common_keys 
+         WHERE (username1 = '""" + username1 + """' AND username2 = '""" + username2 + """') 
+         OR (username1 = '""" + username2 + """' AND username2 = '""" + username1 + """'); """
         self.cursor.execute(sql_select)
         data = self.cursor.fetchall()
         string_to_return = data[0][0]

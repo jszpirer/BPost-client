@@ -83,9 +83,10 @@ def encrypt(sender, dest, content):
 
 async def sendMessage(acc, connection):
     print("Here is your contact list : ", acc.contacts)
-    dest = ''
-    while dest not in acc.contacts:
-        dest = await ainput("Send to : ")
+    dest = await ainput("Send to : ")
+    if dest not in acc.contacts:
+        print("Contact not in list")
+        return
     content = await ainput("Write here : ")
     content = encrypt(acc, dest, content)
     toServ = [acc.getUsername(), content, dest]
