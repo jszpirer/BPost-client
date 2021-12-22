@@ -1,13 +1,13 @@
-import asyncio
 
-from Account.account import *
-from Messaging.message import *
-from Menus.printMenus import *
-from asyncronous_functions import *
-from format import *
-from ServerConnection import ServerConnection
-from Crypt.crypto import hash_pswd
-from Crypt.crypto import encrypt_msg
+from src.Account.account import *
+from src.Messaging.message import *
+from src.Menus.printMenus import *
+from src.asyncronous_functions import *
+from src.format import *
+from src.ServerConnection import ServerConnection
+from src.Crypt.crypto import hash_pswd
+from src.Crypt.crypto import decrypt_str_msg
+from src.Crypt.crypto import encrypt_msg
 
 sep = "<SEP>"
 
@@ -32,7 +32,7 @@ async def reactTopMenu(option, connection):
 
 def decrypt_message(receiver, sender, m):
     fernet = receiver.contact_fernets[sender]
-    return crpt.decrypt_str_msg(fernet, m)
+    return decrypt_str_msg(fernet, m)
 
 
 async def read_messages(acc, connection):
@@ -78,7 +78,7 @@ async def reactActionMenu(option, acc, connection):
 
 def encrypt(sender, dest, content):
     fernet = sender.contact_fernets[dest]
-    return crpt.encrypt_msg(fernet, content)
+    return encrypt_msg(fernet, content)
 
 
 async def sendMessage(acc, connection):

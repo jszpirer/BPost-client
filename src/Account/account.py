@@ -1,5 +1,5 @@
-import Crypt.crypto as crpt
-from Account.Database import Database as keyDatabase
+import src.Crypt.crypto as crpt
+from src.Account.Database import Database as keyDatabase
 
 
 class Account:
