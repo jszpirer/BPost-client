@@ -9,10 +9,8 @@ dh2 = crypto.setup("Eli")
 
 # On recoit du serveur
 foreign_pub_key = dh2.public_key
-print("foreign", foreign_pub_key)
 
 dh.generate_shared_secret(foreign_pub_key, True)
-print("key :",dh.shared_key)
 
 
 # Autre machine
@@ -26,9 +24,9 @@ msg = "Hello la crypto"
 # Envoyer msg à user2
 # acc.encrypt(msg, user2)
 tok = crypto.encrypt_msg(f, "Hello la crypto")
-print(tok)
+
 # send_via_serv
 
 # Recois un msg du serv
 decrypt = crypto.decrypt_str_msg(f, tok)
-print(decrypt)
+
