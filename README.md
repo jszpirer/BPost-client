@@ -8,13 +8,12 @@ This project uses a command-line interface.
 
 To launch the client part of the project, first launch the server (cf. BPost-server repository : https://github.com/AFlachs/BPost-server)
 
-To open a client session, execute the file src/main.py within a Python Virtual Environment. Careful that a user can log in on one device only.
+To open a client session, execute the file src/main.py within a Python Virtual Environment. All modules used in the App are listed in the requirements.txt document. These allow users to build an adapted Python Virtual Environment.
+Careful that a user can log in on one device only.
 
 # Structure
 
 The source code is in src.
-
-All modules used in the App are listed in the requirements.txt document. These allow users to build an adapted Python Virtual Environment.
 
 # Functionalities
 
