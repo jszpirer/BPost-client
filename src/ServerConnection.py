@@ -44,7 +44,6 @@ class ServerConnection:
                     self.private_messages[sender].append(content)
                 else:
                     self.private_messages[sender] = [content]
-            print(order)
 
     def send_message(self, message: str):
         self.messages_to_send.append(message)

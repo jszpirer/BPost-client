@@ -200,7 +200,6 @@ async def confirmationServ(action: int, connection: ServerConnection):
     """checks the answer of the server to the action request (username correct, etc)"""
     while True:
         for order_response in connection.server_responses:
-            print(order_response)
             if order_response[0] == action:  # checks the action value
                 connection.server_responses.remove(order_response)
                 return order_response[1]
