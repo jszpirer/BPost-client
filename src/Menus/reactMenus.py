@@ -1,12 +1,14 @@
 import asyncio
 
-from Account.account import *
-from Menus.printMenus import *
-from asyncronous_functions import *
-from format import *
-from ServerConnection import ServerConnection
-from Crypt.crypto import hash_pswd
-from Crypt.crypto import encrypt_msg
+from src.Account.account import *
+from src.Messaging.message import *
+from src.Menus.printMenus import *
+from src.asyncronous_functions import *
+from src.format import *
+from src.ServerConnection import ServerConnection
+from src.Crypt.crypto import hash_pswd
+from src.Crypt.crypto import decrypt_str_msg
+from src.Crypt.crypto import encrypt_msg
 
 sep = "<SEP>"
 
@@ -98,7 +100,9 @@ async def sendMessage(acc, connection):
     toServ = [acc.getUsername(), content, dest]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
-    if not await confirmationServ(0, connection):
+    if await confirmationServ(0, connection):
+        mess = Message(acc.getUsername(), dest, content)
+    else:
         print("This person does not exist in our database. Please try again.")
         await sendMessage(acc, connection)
 

@@ -1,5 +1,3 @@
-import asyncio
-from Menus.printMenus import *
 from Menus.reactMenus import *
 from asyncronous_functions import *
 

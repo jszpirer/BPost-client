@@ -213,3 +213,4 @@ cython_debug/
 
 /.idea
 **/keys/**
+/src/key_database.db
