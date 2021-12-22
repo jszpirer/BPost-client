@@ -12,8 +12,6 @@ separator = "<SEP>"
 
 async def start_menu(server_conn):
     print("Starting menu")
-    # Todo
-    server_conn.send_message("Test message")
     printTopMenu()  # choice between creating an account or log in
     while True:
         try:
@@ -23,6 +21,7 @@ async def start_menu(server_conn):
         except:
             print("Wrong input. Please enter a number")
     await reactTopMenu(optionTop, server_conn)
+    quit()
 
 
 async def main():
