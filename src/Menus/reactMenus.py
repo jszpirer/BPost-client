@@ -160,7 +160,7 @@ async def changePassword(acc, connection):
             toServ = [acc.getUsername(), hash_pswd(oldPassword), newPassword]
             formatted_request = format_change_password(toServ)
             connection.send_message(formatted_request)
-            if confirmationServ(3, connection):
+            if await confirmationServ(3, connection):
                 print("Password successfully modified")
                 acc = Account(acc.getUsername(), newPassword)
                 return acc
