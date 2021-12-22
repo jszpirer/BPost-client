@@ -1,7 +1,6 @@
 import asyncio
 
 from Account.account import *
-from Messaging.message import *
 from Menus.printMenus import *
 from asyncronous_functions import *
 from format import *
@@ -92,9 +91,7 @@ async def sendMessage(acc, connection):
     toServ = [acc.getUsername(), content, dest]
     formatted_request = format_send_message(toServ)
     connection.send_message(formatted_request)
-    if await confirmationServ(0, connection):
-        mess = Message(acc.getUsername(), dest, content)
-    else:
+    if not await confirmationServ(0, connection):
         print("This person does not exist in our database. Please try again.")
         await sendMessage(acc, connection)
 
