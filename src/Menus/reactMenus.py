@@ -12,6 +12,7 @@ sep = "<SEP>"
 
 
 async def reactTopMenu(option, connection):
+    """Launches the actions requested on the top menu based on the choice (option) requested by the user"""
     if option == 1:  # create account
         acc = await createAccount(connection)
     elif option == 2:  # login
@@ -30,11 +31,13 @@ async def reactTopMenu(option, connection):
 
 
 def decrypt_message(receiver, sender, m):
+    """Decrypts the message received"""
     fernet = receiver.contact_fernets[sender]
     return crpt.decrypt_str_msg(fernet, m)
 
 
 async def read_messages(acc, connection):
+    """Allows to read the messages of a conversation with another user"""
     messages = connection.private_messages
     for sender in messages:
         print(sender + " (" + str(len(connection.private_messages)) + ")")
@@ -52,6 +55,7 @@ async def read_messages(acc, connection):
 
 
 async def reactActionMenu(option, acc, connection):
+    """Launches the actions requested on the action menu based on the choice (option) requested by the user"""
     if option == 1:  # send a message
         await sendMessage(acc, connection)
     elif option == 2:  # add a contact to the contact list
@@ -76,11 +80,14 @@ async def reactActionMenu(option, acc, connection):
 
 
 def encrypt(sender, dest, content):
+    """Encryption of the message before it is added to the list of messages to send to the server"""
     fernet = sender.contact_fernets[dest]
     return crpt.encrypt_msg(fernet, content)
 
 
 async def sendMessage(acc, connection):
+    """Action to send a message to another user. This function asks the user the destination and content of the message
+    then encrypts the message, formats it and adds it to the list of messages to send to the server"""
     print("Here is your contact list : ", acc.contacts)
     dest = await ainput("Send to : ")
     if dest not in acc.contacts:
@@ -97,6 +104,8 @@ async def sendMessage(acc, connection):
 
 
 async def createAccount(connection):
+    """Asks the username and password of the account the user wants to create, formats the request and adds it to the list of
+    information to send to the server"""
     print("You don't have an account yet. Please enter a username and then enter a password")
     username = await ainput("Username : ")
     password = await ainput("Your password : ")
@@ -122,6 +131,7 @@ async def createAccount(connection):
 
 
 async def authenticate(connection):
+    """Presents the authentication of the user (username + password) when they enter the app"""
     print("Welcome back to the BPost Messaging App !")
     print("Please enter your username and then enter your password")
     username, password = await get_user_identification()
@@ -129,6 +139,8 @@ async def authenticate(connection):
 
 
 async def login_on_serv(connection, username, password):
+    """Formats the authentication, adds it to the list of information to send to the server, then
+    verify the answer of the server to confirm the login"""
     formatted_request = format_login_request([username, password])
     connection.send_message(formatted_request)
     if await confirmationServ(1, connection):
@@ -141,6 +153,7 @@ async def login_on_serv(connection, username, password):
 
 
 async def get_user_identification():
+    """Gets the identification of the user when they login"""
     username = await ainput("Username : ")
     password = await ainput("Your password : ")
     password = hash_pswd(password)
@@ -148,6 +161,7 @@ async def get_user_identification():
 
 
 async def changePassword(acc, connection):
+    """Allows the user to change passwords, based on their current password"""
     oldPassword = await ainput("Current password : ")
     if hash_pswd(oldPassword) == acc.password:
         newPassword = await ainput("New password : ")
@@ -170,11 +184,14 @@ async def changePassword(acc, connection):
 
 
 async def askContact(acc, connection):
+    """The user enters the name of the contact they want to add to their list"""
     contact = await ainput("What is the username of the contact you would like to add to your list : ")
     await add_contact(acc, connection, contact)
 
 
 async def add_contact(acc, connection, contact):
+    """Formats the info of the contact to add to the contacts list, adds it to the list of info to send to the server,
+    validates the addition of the contact to the list and gets the public key of the latter"""
     toServ = [acc.getUsername(), contact]
     formatted_request = format_add_contact(toServ)
     connection.send_message(formatted_request)
@@ -188,6 +205,8 @@ async def add_contact(acc, connection, contact):
 
 
 async def confirmation_new_contact(connection: ServerConnection):
+    """Checks the answer of the server to the addition of a contact to the list of contacts and
+    gets the public key of the said contact"""
     while True:
         for order_response in connection.server_responses:
             if order_response[0] == 4:  # Réponse d'un ajout de contact

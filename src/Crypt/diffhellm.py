@@ -6,6 +6,7 @@ import os
 
 
 def generate_keys(dh: DiffieHellman, username: str):
+    """Generates public and private keys if they are not stored yet"""
     private_key_file = pathlib.Path(__file__).with_name("keys") / username / "private.txt"
     public_key_file = pathlib.Path(__file__).with_name("keys") / username / "public.txt"
     if genericpath.isfile(public_key_file):

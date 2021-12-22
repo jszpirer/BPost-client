@@ -19,10 +19,12 @@ class Account:
 
     # store username and password in database
     def newContact(self, contact_username, contact_public_key):
+        """Adds the new contact from the list to the database with its public key that will generate the shared key"""
         self.contacts.append(contact_username)
         self.dh.generate_shared_secret(int(contact_public_key))
         self.key_database.add_new_line(self.username, contact_username, self.dh.shared_key)
         self.contact_fernets[contact_username] = crpt.create_fernet_from_shared_key(self.dh.shared_key)
 
     def getUsername(self):
+        """Returns the username of an account"""
         return self.username

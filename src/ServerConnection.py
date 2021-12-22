@@ -15,10 +15,12 @@ class ServerConnection:
         self.keep_turning = True
 
     async def start(self):
+        """Starts the server"""
         print("Starting server")
         await self.connect()
 
     async def connect(self):
+        """Connects to the server"""
         async with websockets.connect(self.uri, ssl=self.ssl_context) as ws:
             await asyncio.gather(
                 self.sender_handler(ws),
@@ -26,6 +28,8 @@ class ServerConnection:
             )
 
     async def sender_handler(self, ws):
+        """Sends the elements of the list of elements to send to the server and then removes them from the list
+        once they are sent"""
         while self.keep_turning:
             for m in self.messages_to_send:
                 await ws.send(m)
@@ -33,6 +37,8 @@ class ServerConnection:
             await asyncio.sleep(0.01)
 
     async def receiver_handler(self, ws):
+        """Analyses the list of elements received from the server and separates it between the confirmation responses
+        and the private messages"""
         async for order in ws:
             if format.order_is_confirmation(order):
                 print("Added to responses")
@@ -46,4 +52,5 @@ class ServerConnection:
                     self.private_messages[sender] = [content]
 
     def send_message(self, message: str):
+        """Adds formatted messages (configuration and messages for clients) to the list of elements to send to the server"""
         self.messages_to_send.append(message)
