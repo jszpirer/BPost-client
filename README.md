@@ -1,6 +1,6 @@
 # BPost-client
 
-BPost is a Messaging App implemented for the project of the Communication Networks and Protocols course from Prof. Dricot.
+BPost is a Messaging App implemented for the project of the Communication Networks : Protocols and Architectures course from Prof. Dricot.
 
 # Execute
 To launch the client part of the project, first launch the server (cf. BPost-server repository : https://github.com/AFlachs/BPost-server)
