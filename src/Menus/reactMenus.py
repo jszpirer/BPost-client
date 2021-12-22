@@ -1,3 +1,4 @@
+import asyncio
 
 from src.Account.account import *
 from src.Messaging.message import *
@@ -32,7 +33,7 @@ async def reactTopMenu(option, connection):
 
 def decrypt_message(receiver, sender, m):
     fernet = receiver.contact_fernets[sender]
-    return decrypt_str_msg(fernet, m)
+    return crpt.decrypt_str_msg(fernet, m)
 
 
 async def read_messages(acc, connection):
@@ -78,7 +79,7 @@ async def reactActionMenu(option, acc, connection):
 
 def encrypt(sender, dest, content):
     fernet = sender.contact_fernets[dest]
-    return encrypt_msg(fernet, content)
+    return crpt.encrypt_msg(fernet, content)
 
 
 async def sendMessage(acc, connection):
@@ -203,7 +204,6 @@ async def confirmationServ(action: int, connection: ServerConnection):
     """checks the answer of the server to the action request (username correct, etc)"""
     while True:
         for order_response in connection.server_responses:
-            print(order_response)
             if order_response[0] == action:  # checks the action value
                 connection.server_responses.remove(order_response)
                 return order_response[1]

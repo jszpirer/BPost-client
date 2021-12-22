@@ -5,7 +5,6 @@ def format_send_message(to_server):  #send
     sender = to_server[0]
     message = to_server[1]
     recipient = to_server[2]
-    print("message", message)
     return str(0)+sep+sender+sep+str(message)+sep+recipient
 
 
@@ -58,8 +57,6 @@ def inverse_format(from_server):
         mess = input[1]
         sender = input[2]
         return sender, mess
-    else:
-        print("error action "+str(action))
 
 
 def order_is_confirmation(order: str):

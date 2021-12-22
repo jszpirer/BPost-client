@@ -16,7 +16,6 @@ def generate_keys(dh: DiffieHellman, username: str):
         dh.public_key = int(f.read())
         f.close()
     else:
-        print("generating new private key")
         os.makedirs(pathlib.Path(__file__).with_name("keys") / username)
         dh.generate_private_key()
         dh.generate_public_key()

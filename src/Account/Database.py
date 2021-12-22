@@ -41,13 +41,10 @@ class Database:
     def add_new_line(self, username1, username2, common_key):
         """We add a common key for a new pair of users. To do when username1 has a new contact."""
         if username2 == "" or username1 == "" or common_key == "":
-            print("The arguments can't be empty.")
             return False
         if self.common_key_in_database(common_key):
-            print("The common key already exists.")
             return False
         else:
-            print("The pair of users doesn't exist so we're gonna add it.")
             self.__open_connection()
             sql_insert_client = """INSERT INTO common_keys
              VALUES('""" + username1 + """','""" + username2 + """','"""+common_key+"""');"""
@@ -64,10 +61,8 @@ class Database:
         data = self.cursor.fetchall()
         self.__close_connection()
         if len(data) == 0:
-            print('There is no common key :' + common_key)
             return False
         else:
-            print('Common key ' + common_key + ' found.')
             return True
 
     def select_contact_list(self, username):
